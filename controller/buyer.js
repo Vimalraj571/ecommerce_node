@@ -1,41 +1,46 @@
-import express from 'express'
-import { v4 as uuid_v4 } from "uuid";
-import { userList, catalogList, productList, orderList as orders } from "./temp.js"
+import express from 'express';
+
+import Catalog from '../model/catalog.js';
+import Order from '../model/order.js';
+import Product from '../model/product.js';
+import User from '../model/user.js';
 
 const buyerRouter = express.Router()
 
+const productResolver = async (name) => {
+    const product = await Product.findOne({ name: name })
+    return product._id
+}
+
+const buyerResolver = async (name) => {
+    const buyer = await User.findOne({ username: name })
+    return buyer._id
+}
+
 buyerRouter.get('/list-of-sellers', async (request, response) => {
-    const sellerList = userList.filter(user => user.type === "seller")
+    const sellerList = await User.find({ type: "seller" })
     response.status(200).send(sellerList)
 })
 
 buyerRouter.get('/seller-catalog/:seller_id', async (request, response) => {
     const { params } = request
-    const catalogListSeller = catalogList.find(c => c.seller_id === params.seller_id)
 
-    let temp = []
+    const catelogList = await Catalog.findOne({ sellerId: params.seller_id }).populate("catalog", { price: 1, name: 1 })
 
-    for (let item of catalogListSeller.catalog) {
-        for (let product of productList) {
-            if (item === product.id) {
-                temp.push(product)
-            }
-        }
+    if (catelogList.catalog.length === 0) {
+        return response.status(200).send({ message: "Sorry This seller don't have any product" })
     }
-    // response.send("/seller-catalog/:seller_id")
-    response.status(200).send(temp)
+    response.status(200).send(catelogList)
 })
 
 buyerRouter.post('/create-order/:seller_id', async (request, response) => {
     const { products, buyer_id } = request.body
 
-    const newOrder = { buyer_id, products, id: uuid_v4(), seller_id: request.params.seller_id }
+    const newOrder = new Order({ buyerId: buyer_id, products, sellerId: request.params.seller_id })
 
-    let orderList = orders.concat(newOrder)
+    await newOrder.save()
 
-    response.status(200).send(orderList)
-    // response.send("/create-order/:seller_id")
+    response.status(200).send({ message: 'Ordered Successfully' })
 })
-
 
 export default buyerRouter

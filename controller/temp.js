@@ -1,5 +1,5 @@
 // const { userList } = require("./auth");
-
+// test stub data
 export const userList = [
     {
         username: "postman",

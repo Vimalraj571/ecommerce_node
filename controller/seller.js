@@ -1,31 +1,45 @@
-import express from 'express'
-import { v4 as uuid_v4 } from "uuid";
-import { productList as cat, orderList as orders } from "./temp.js"
+import express from 'express';
+import jwt from 'jsonwebtoken';
+import Product from '../model/product.js';
+import Catalog from '../model/catalog.js';
+import middleware from '../utils/middleware.js';
 
-let productList = cat
-let orderList = orders
+import Order from '../model/order.js';
 
 const sellerRouter = express.Router()
 
-sellerRouter.post('/create-catalog', async (request, response) => {
-    const { seller_id, catalogs } = request.body
+sellerRouter.post('/create-catalog', middleware.userExtractor, async (request, response) => {
+    const { catalogs } = request.body
 
-    let newCat = {}
-    for (let cat of catalogs) {
-        newCat = { ...cat, id: uuid_v4() }
-        productList = productList.concat(newCat)
+    const decodeToken = jwt.verify(request.token, process.env.SECRET)
+    if (!decodeToken.id) {
+        return response.status(404).json({ error: 'token is missing or invalid' })
     }
-    console.log(productList)
-    response.status(200).send(productList)
-    // response.send("create-catalog")
+
+    let catelogData = await Catalog.findOne({ sellerId: decodeToken.id })
+
+    const promises = catalogs.map(async cat => {
+        let productData = new Product({
+            name: cat.name,
+            price: cat.price,
+        })
+        let insertedProductData = await productData.save()
+        catelogData.catalog = catelogData.catalog.concat(insertedProductData)
+    })
+    await Promise.all(promises).then(async () => {
+        await catelogData.save()
+    });
+
+    response.status(200).send({ message: "Catalog Created Successfully" })
 })
 
-sellerRouter.get('/orders', async (request, response) => {
-    // get id from the request header auth 
-    // filter order based on the seller id
-    const sellerOrder = orderList.filter(o => o.seller_id === "9e524f61-947a-4510-95d7-89f5d4fea87d")
-    response.status(200).send(sellerOrder)
-    // response.send("orders")
+sellerRouter.get('/orders', middleware.userExtractor, async (request, response) => {
+    const decodeToken = jwt.verify(request.token, process.env.SECRET)
+    if (!decodeToken.id) {
+        return response.status(404).json({ error: 'token is missing or invalid' })
+    }
+    let orders = await Order.find({ sellerId: decodeToken.id }).populate("products")
+    response.status(200).send(orders)
 })
 
 export default sellerRouter
