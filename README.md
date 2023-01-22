@@ -3,6 +3,7 @@
 Simple Ecommerce App written in Node and Mongo
 
 Functionality
+
     1. User Register (type: buyer/seller)
     2. Authendication
     3. Add Product (type: seller)
