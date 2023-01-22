@@ -1,0 +1,140 @@
+{
+	"variables": [],
+	"info": {
+		"name": "E-Commerce",
+		"_postman_id": "dcef2e85-8939-4435-b1c2-6d6274ce6bae",
+		"description": "REST API endpoints that enable the following functionality.\n1.Buyers and sellers can register and login to the system\n\n2.Sellers can build a catalog of items, with each item having a name and price\n\n3.Buyers can GET a list of sellers\n\n4.Buyers can GET a specific seller's catalog (list of items)\n\n5.Buyers can create an Order that contains a list of items \nfrom the seller's catalog\n\n6.Sellers can GET a list of all orders they've received",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth API - Register User",
+			"request": {
+				"url": "localhost:3001/api/auth/register",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"username\": \"postseller\",\r\n\t\"password\": \"test\",\r\n\t\"type\": \"seller\"\r\n}"
+				},
+				"description": "/api/auth/register"
+			},
+			"response": []
+		},
+		{
+			"name": "Auth API - Login User",
+			"request": {
+				"url": "localhost:3001/api/auth/login ",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"username\": \"test2sell\",\r\n\t\"password\": \"test\"\r\n}"
+				},
+				"description": "/api/auth/login"
+			},
+			"response": []
+		},
+		{
+			"name": "Buyers API -  List of Seller",
+			"request": {
+				"url": "localhost:3001/api/buyer/list-of-sellers",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "Get a list of all sellers\n/api/buyer/list-of-sellers"
+			},
+			"response": []
+		},
+		{
+			"name": "Buyers API - Get Seller By Id",
+			"request": {
+				"url": "localhost:3001/api/buyer/seller-catalog/63cd40bc732463796910898d",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "Get the catalog of a seller by seller_id\n/api/buyer/seller-catalog/:seller_id"
+			},
+			"response": []
+		},
+		{
+			"name": "Buyers API - Create Order For Seller",
+			"request": {
+				"url": "localhost:3001/api/buyer/create-order/63cd40bc732463796910898d",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"buyer_id\":\"63cd40b2732463796910898a\",\n\t\"products\":[\"63cd4afd385fa0f38dd3f714\",\"63cd4ad5385fa0f38dd3f70f\"]\n}"
+				},
+				"description": "Send a list of items to create an order for seller with id = seller_id\n/api/buyer/create-order/:seller_id"
+			},
+			"response": []
+		},
+		{
+			"name": "Sellers API - Create Catalog for Seller",
+			"request": {
+				"url": "localhost:3001/api/seller/create-catalog",
+				"method": "POST",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3Qyc2VsbCIsImlkIjoiNjNjZDQwYmM3MzI0NjM3OTY5MTA4OThkIiwiaWF0IjoxNjc0NDA4NDMxLCJleHAiOjE2NzQ0MTIwMzF9.JBO_oFIJZx63ERf-Xen8WpsuZbl76-30Uh0Wdob5kxY",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"catalogs\": [\n    {\n      \"name\": \"popcorn\",\n      \"price\": 10\n    }\n  ]\n}"
+				},
+				"description": "Send a list of items to create a catalog for a seller\n/api/seller/create-catalog"
+			},
+			"response": []
+		},
+		{
+			"name": "Sellers API - List of Order ",
+			"request": {
+				"url": "localhost:3001/api/seller/orders",
+				"method": "GET",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3Qyc2VsbCIsImlkIjoiNjNjZDQwYmM3MzI0NjM3OTY5MTA4OThkIiwiaWF0IjoxNjc0NDA4NDMxLCJleHAiOjE2NzQ0MTIwMzF9.JBO_oFIJZx63ERf-Xen8WpsuZbl76-30Uh0Wdob5kxY",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": "Retrieve the list of orders received by a seller\n/api/seller/orders"
+			},
+			"response": []
+		}
+	]
+}
